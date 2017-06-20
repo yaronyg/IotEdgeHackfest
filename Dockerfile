@@ -26,20 +26,31 @@ RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 417A0893
 RUN apt-get install -y apt-transport-https
 RUN apt-get update
 # 1.0.1 of the dotnet tool will give us .net core 1.1.1 which is what the current release of IoT Edge is built against
-# 1.0.4 of the dotnet tool will guse us .net core 1.1.2 but to use that, at a minimum, we have to update dotnet_core_loader.h
+# 1.0.4 of the dotnet tool will give us .net core 1.1.2 but to use that, at a minimum, we have to update dotnet_core_loader.h
 RUN apt-get install -y dotnet-dev-1.0.1
 
 # Checkout code
 WORKDIR /usr/src/app
 RUN git clone https://github.com/Azure/iot-edge.git
 
-# Build
+# Add our custom modules 
+ADD ./IotEdgeFiles/modules /usr/src/app/iot-edge/samples/dotnet_core_module_sample/modules
+# BUGBUG: I'm pretty sure this isn't neded, that this work is done by ./build.sh, need to investigate
+WORKDIR /usr/src/app/iot-edge/samples/dotnet_core_module_sample/modules/HelloWorld
+RUN dotnet restore
+RUN dotnet build
+
+# Build IoT Edge Infrastructure
 WORKDIR /usr/src/app/iot-edge/tools
 RUN ./build.sh --enable-dotnet-core-binding
+# BUGBUG: I'm failre sure that build_dotnet_core.sh isn't needed, that build.sh calls it
 RUN ./build_dotnet_core.sh
 
 # RUN
-WORKDIR /usr/src/app/iot-edge/build
+WORKDIR /usr/src/app/iot-edge/build/samples/dotnet_core_module_sample
+ADD ./IotEdgeFiles/config.json /usr/src/app/iot-edge/build/samples/dotnet_core_module_sample
+CMD ["./dotnet_core_module_sample", "config.json"]
+
 
 ## cat config file into env var
 # ENTRYPOINT J_FILE=$(cat /usr/src/app/iot-edge/samples/simulated_device_cloud_upload/src/simulated_device_cloud_upload_lin.json) \

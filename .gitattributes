@@ -1,2 +1,3 @@
 * text eol=lf
 *.md text eol=crlf
+*.cs text auto

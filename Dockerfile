@@ -31,25 +31,18 @@ RUN apt-get install -y dotnet-dev-1.0.1
 
 # Checkout code
 WORKDIR /usr/src/app
-RUN git clone https://github.com/Azure/iot-edge.git
+RUN git clone https://github.com/yaronyg/iot-edge.git
 
-# Add our custom modules 
-ADD ./IotEdgeFiles/modules /usr/src/app/iot-edge/samples/dotnet_core_module_sample/modules
-# BUGBUG: I'm pretty sure this isn't neded, that this work is done by ./build.sh, need to investigate
-WORKDIR /usr/src/app/iot-edge/samples/dotnet_core_module_sample/modules/HelloWorld
-RUN dotnet restore
-RUN dotnet build
 
 # Build IoT Edge Infrastructure
 WORKDIR /usr/src/app/iot-edge/tools
-RUN ./build.sh --enable-dotnet-core-binding
-# BUGBUG: I'm failre sure that build_dotnet_core.sh isn't needed, that build.sh calls it
+# BUGBUG: I'm fairly sure that build_dotnet_core.sh isn't needed, that build.sh calls it
 RUN ./build_dotnet_core.sh
+RUN ./build.sh --enable-dotnet-core-binding
 
 # RUN
 WORKDIR /usr/src/app/iot-edge/build/samples/dotnet_core_module_sample
-ADD ./IotEdgeFiles/config.json /usr/src/app/iot-edge/build/samples/dotnet_core_module_sample
-CMD ["./dotnet_core_module_sample", "config.json"]
+CMD ["./dotnet_core_module_sample", "/usr/src/app/iot-edge/samples/dotnet_core_managed_gateway/dotnet_core_managed_gateway_lin.json"]
 
 
 ## cat config file into env var

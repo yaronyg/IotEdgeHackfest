@@ -65,4 +65,4 @@ Then navigate in the bash shell to:
 
 And then run the gateway:
 
-    ./dotnet_core_module_sample "/usr/src/app/iot-edge/samples/dotnet_core_managed_gateway/dotnet_core_managed_gateway_lin.json"
+    ./dotnet_core_module_sample /usr/src/app/iot-edge/samples/dotnet_core_managed_gateway/dotnet_core_managed_gateway_lin.json

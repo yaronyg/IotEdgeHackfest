@@ -36,25 +36,25 @@ We also need to setup the dev box per https://github.com/Azure/iot-edge/blob/mas
 
 # Running on Docker
 First, clone this depot since it has the Dockerfile we need:
-git clone https://github.com/yaronyg/IotEdgeHackfest.git
+    git clone https://github.com/yaronyg/IotEdgeHackfest.git
 
 Then navigate into the repro:
-cd IotEdgeHackfest
+    cd IotEdgeHackfest
 
 Then build the docker image (yes, we'll eventually publish but for now things are changing a bit too fast for that):
-docker build -t yarongmsft/hackfest:main .
+    docker build -t yarongmsft/hackfest:main .
 
 The start the docker container running, I have had issues with the gateway exiting even though it's waiting for enter and I have been too lazy to fix it so instead I use tail -f /dev/null to keep the docker image running constantly:
-docker run -d yarongmsft/hackfest:main tail -f /dev/null
+    docker run -d yarongmsft/hackfest:main tail -f /dev/null
 
 Then find out the container ID:
-docker ps
+    docker ps
 
 Then open a bash shell to the docker container:
-docker exec -i -t [id] /bin/bash
+    docker exec -i -t [id] /bin/bash
 
 Then navigate in the bash shell to:
-cd /usr/src/app/iot-edge/build/samples/dotnet_core_module_sample
+    cd /usr/src/app/iot-edge/build/samples/dotnet_core_module_sample
 
 And then run the gateway:
-./dotnet_core_module_sample "/usr/src/app/iot-edge/samples/dotnet_core_managed_gateway/dotnet_core_managed_gateway_lin.json"
+    ./dotnet_core_module_sample "/usr/src/app/iot-edge/samples/dotnet_core_managed_gateway/dotnet_core_managed_gateway_lin.json"

@@ -6,7 +6,7 @@ These instructions are really just meant for throwing together debug builds and 
 # Running on Windows
 ## Setup
 1. Install 64-bit version of the SDK at https://github.com/dotnet/core/blob/master/release-notes/download-archives/1.1.1-download.md
- 1. build.cmd (see below) actually defaults to 32 bit but if we want to debug in Visual Studio Code we have to have a 64 bit executable. So we are building as 64 bit.
+   1. build.cmd (see below) actually defaults to 32 bit but if we want to debug in Visual Studio Code we have to have a 64 bit executable. So we are building as 64 bit.
 1. Setup the dev box per https://github.com/Azure/iot-edge/blob/master/doc/devbox_setup.md#set-up-a-windows-development-environment.
 1. Fork https://github.com/yaronyg/iot-edge on github (so you can save your changes) and then clone your fork locally
 1. Open a Visual Studio Command Prompt (Start -> Developer Command Prompt for Visual Studio 2017)

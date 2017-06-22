@@ -33,7 +33,6 @@ RUN apt-get install -y dotnet-dev-1.0.1
 WORKDIR /usr/src/app
 RUN git clone https://github.com/yaronyg/iot-edge.git
 
-
 # Build IoT Edge Infrastructure
 WORKDIR /usr/src/app/iot-edge/tools
 # BUGBUG: I'm fairly sure that build_dotnet_core.sh isn't needed, that build.sh calls it

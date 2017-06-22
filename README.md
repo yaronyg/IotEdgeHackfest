@@ -5,13 +5,13 @@ These instructions are really just meant for throwing together debug builds and 
 
 # Running on Windows
 ## Setup
-1. Install 32-bit version of the SDK at https://github.com/dotnet/core/blob/master/release-notes/download-archives/1.1.1-download.md
- 1. We are using the 32 bit version because IoT Edge defaults to that. We can change this by calling tools/build.cmd with the -platform argument or edit the build-platform variable in build.cmd (to either Win32 or x64).
+1. Install 64-bit version of the SDK at https://github.com/dotnet/core/blob/master/release-notes/download-archives/1.1.1-download.md
+ 1. build.cmd (see below) actually defaults to 32 bit but if we want to debug in Visual Studio Code we have to have a 64 bit executable. So we are building as 64 bit.
 1. Setup the dev box per https://github.com/Azure/iot-edge/blob/master/doc/devbox_setup.md#set-up-a-windows-development-environment.
 1. Fork https://github.com/yaronyg/iot-edge on github (so you can save your changes) and then clone your fork locally
 1. Open a Visual Studio Command Prompt (Start -> Developer Command Prompt for Visual Studio 2017)
 1. Navigate to iot-edge\tools
-1. Run 'build.cmd --enable-dotnet-core-binding'
+1. Run 'build.cmd --platform x64 --enable-dotnet-core-binding'
 ## Adding a new module
 1. Open a terminal (doesn't have to be VS command prompt)
 1. Go to iot-edge\tools
@@ -33,10 +33,54 @@ Note that this will delete all the source files from the modules directory.
 Note that this will not delete any values in dotnet_core_managed_gateway_win/lin.json.
 
 Running delete while Visual Studio has the solution open will cause the module's directory to be recreated but just with Visual Studio contents. However the existence of the directory will prevent --new from working so please make sure to manually go in an delete it or close the solution in Visual Studio before using delete.
-## Building and running
+## Build and running from Visual Studio Code
+### Setting up VS Code to support debugging the IoT Edge Gateway
+1. Start Visual Studio Code
+1. Install C# extension (Omnisharp) if it isn't already installed
+1. Hit the debug icon on the navigation bar on the left side of the screen
+1. Hit the settings wheel icon on the top of the debug window on the left, this will open launch.json
+1. Enter the code below as a configuration:
+```JSON
+        {
+            "name": ".NET Core Launch (console)",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceRoot}/build/samples/dotnet_core_module_sample/Debug/dotnet_core_module_sample.exe",
+            "args": ["${workspaceRoot}\\samples\\dotnet_core_managed_gateway\\dotnet_core_managed_gateway_win.json"],
+            "cwd": "${workspaceRoot}",
+            "stopAtEntry": false,
+            "console": "internalConsole"
+        }
+```
+1. ctrl-shift-p and type in tasks and select Configure Tasks Runner and replace the value with:
+```JSON
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "0.1.0",
+    "tasks": [
+        {
+            "taskName": "build",
+            "command": "${workspaceRoot}\\tools\\manage_module_projects.cmd",
+            "isBuildCommand": true,
+            "args": ["--build"],
+            "isShellCommand": true,
+            "showOutput": "silent" 
+        }
+    ]
+}
+```
+### Launching debugging
+1. Hit the debug icon on the navigation bar on the left side of the screen
+1. Select ".NET Core Launch (console)" from the launch drop down
+1. Hit the green arrow
+
+Note that you can place break points in your .net core module code and they should work fine. Also note that your modules will only be called if they are specified in dotnet_core_managed_gateway_win.json.
+## Building and/or running from the command line
 1. Open a terminal
 1. Go to iot-edge\tools
-1. Run 'managed_module_projects.cmd --buildRun'
+1. Run 'managed_module_projects.cmd --build' to just build and copy the files over to the sample managed gateway in dotnet_core_module_sample or run 'managed_module_projects.cmd --buildRun' to both build and start the gateway.
 # Running on Docker
 First, clone this depot since it has the Dockerfile we need:
 

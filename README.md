@@ -16,7 +16,7 @@ These instructions are really just meant for throwing together debug builds and 
 1. Open a terminal (doesn't have to be VS command prompt)
 1. Go to iot-edge\tools
 1. Run 'managed_module_projects.cmd --new Foo'
- 1. Foo is to be replaced with the name of the project. It's best to just use something short and don't include the world Module as the system will append that where appropriate.
+   1. Foo is to be replaced with the name of the project. It's best to just use something short and don't include the world Module as the system will append that where appropriate.
 
 At this point the module now exists. But if you want it to be called by the gateway then you hae to edit iot-edge\samples\dotnet_core_managed_gateway\dotnet_core_managed_gateway_win.json for Windows and the lin version for Docker.
 

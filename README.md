@@ -9,11 +9,8 @@ These instructions are really just meant for throwing together debug builds and 
    1. build.cmd (see below) actually defaults to 32 bit but if we want to debug in Visual Studio Code we have to have a 64 bit executable. So we are building as 64 bit.
 1. Setup the dev box per https://github.com/Azure/iot-edge/blob/master/doc/devbox_setup.md#set-up-a-windows-development-environment.
 1. Fork https://github.com/yaronyg/iot-edge on github (so you can save your changes) and then clone your fork locally
-1. Open a Visual Studio Command Prompt (Start -> Developer Command Prompt for Visual Studio 2017)
-1. Navigate to iot-edge\tools
-1. Run 'build.cmd --platform x64 --enable-dotnet-core-binding'
 ## Adding a new module
-1. Open a terminal (doesn't have to be VS command prompt)
+1. Open a Visual Studio Command Prompt (Start -> Developer Command Prompt for Visual Studio 2017)
 1. Go to iot-edge\tools
 1. Run 'managed_module_projects.cmd --new Foo'
    1. Foo is to be replaced with the name of the project. It's best to just use something short and don't include the world Module as the system will append that where appropriate.
@@ -77,10 +74,57 @@ Running delete while Visual Studio has the solution open will cause the module's
 1. Hit the green arrow
 
 Note that you can place break points in your .net core module code and they should work fine. Also note that your modules will only be called if they are specified in dotnet_core_managed_gateway_win.json.
+
+Note that if you have never built from the command line (see below) it's possible that the VS Code build might run into issues. In that case just build once from the command line and all should be fine.
 ## Building and/or running from the command line
 1. Open a terminal
 1. Go to iot-edge\tools
 1. Run 'managed_module_projects.cmd --build' to just build and copy the files over to the sample managed gateway in dotnet_core_module_sample or run 'managed_module_projects.cmd --buildRun' to both build and start the gateway.
+## Experimenting with .net core 2.0
+_WARNING: THIS IS EXPERIMENTAL. PROCEED AT EVEN MORE RISK THAN USUAL_
+
+1. Download and install from https://www.microsoft.com/net/core/preview#windowscmd
+1. Open a Visual Studio Command Prompt (Start -> Developer Command Prompt for Visual Studio 2017)
+1. Go to iot-edge\tools
+1. Run 'managed_module_projects.cmd --switch 2'
+
+The previous will switch all the sample projects to .NET Core 2 as well as the gateway. Any new projects created with managed_module_projects.cmd will also be .net core 2 projects.
+
+### Switch from .net core 2.0 back to .net core 1.1.1
+It is possible to switch back. Probably the safest way is:
+1. Run https://www.microsoft.com/net/core/preview#windowscmd and choose uninstall
+    1. This will revert to the previous version
+1. Open a Visual Studio Command Prompt (Start -> Developer Command Prompt for Visual Studio 2017)
+1. Go to iot-edge\tools
+1. Run 'managed_module_projects.cmd --switch 1'
+
+The last command will restore the gateway and the sample projects to .NET Core 1.1.1. Note however that if a module depends on .net core 2.0 features then it won't work after the last step.
+### .net core 2.0 and docker
+#### Developing and testing
+We assume that development is done on the Windows box and then tests run on docker. So once we have switched the gateway to 2.0 on the Windows host we need to copy the changes to docker and change docker's version of .net to 2.0.
+#### One Time Setup
+
+1. Go to the docker terminal
+1. Run 'apt-get install -y dotnet-dev-2.0.0-preview1-005977'
+1. Run 'rm -rf /usr/src/app/iot-edge/build/'
+    1. This cleans up CMake cache and other files left over from windows
+1. Run 'rm -rf /usr/src/app/iot-edge/install-deps/'
+    1. More clean up from windows
+1. cd to /usr/src/app/iot-edge/tools
+1. Run './build.sh --enable-dotnet-core-binding'
+
+#### Iterative development
+
+1. Go to windows terminal
+1. Type in 'docker cp [root]\iot-edge [ID]:/usr/src/app
+    1. Where root, on my machine is c:\depots or whatever the path to iot-edge on the Windows host is. The ID is the container ID from 'docker ps'
+1. Make sure to update dotnet_core_managed_gateway_lin.json
+    1. Since I don't really do anything Linux specific in the config file I just use '/usr/src/app/iot-edge/samples/dotnet_core_managed_gateway/dotnet_core_managed_gateway_win.json'
+1. Go to the docker terminal
+1. cd to /usr/src/app/iot-edge/build/samples/dotnet_core_module_sample
+1. Run './dotnet_core_module_sample /usr/src/app/iot-edge/samples/dotnet_core_managed_gateway/dotnet_core_managed_gateway_win.json'
+    1. Again, I'm using _win because nothing I'm up to is different on Linux vs Windows
+
 # Running on Docker
 First, clone this depot since it has the Dockerfile we need:
 
